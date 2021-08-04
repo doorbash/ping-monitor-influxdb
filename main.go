@@ -29,7 +29,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	InfluxDBHelper := NewInfluxDBHelper(appConfig)
+	influxDBHelper := NewInfluxDBHelper(appConfig)
 
 	pingChan := make(chan PingResult, 100)
 
@@ -38,6 +38,6 @@ func main() {
 	}
 
 	for ping := range pingChan {
-		InfluxDBHelper.SendData(ping)
+		influxDBHelper.SendData(ping)
 	}
 }
