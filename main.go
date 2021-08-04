@@ -21,6 +21,8 @@ func main() {
 		return
 	}
 
+	initConstants()
+
 	config := NewConfigParser(opts.Config)
 	appConfig, err := config.Load()
 	if err != nil {
