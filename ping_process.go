@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"regexp"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -23,10 +21,10 @@ func (p *PingProcess) StartPingProcess() {
 	go func() {
 		for {
 			var cmd *exec.Cmd
-			switch _os := runtime.GOOS; _os {
-			case "linux":
+			switch constants.goos {
+			case NIX:
 				cmd = exec.Command("/usr/bin/ping", p.Address, "-O", "-W", "700")
-			case "windows":
+			case WIN:
 				cmd = exec.Command(fmt.Sprintf("%s\\system32\\ping.exe", os.Getenv("WINDIR")), p.Address, "-t", "-w", "700")
 			default:
 				log.Fatalln("OS not supported")
@@ -98,11 +96,12 @@ func (p *PingProcess) parseLine(line string) {
 		return
 	}
 
-	patternNix, _ := regexp.Compile("(.*) bytes from (.*): icmp_seq=(.*) ttl=(.*) time=(.*) ms")
-
-	if patternNix.MatchString(line) {
-		// NIX
-		subMatches := patternNix.FindStringSubmatch(line)
+	switch constants.goos {
+	case NIX:
+		if !constants.patternNix.MatchString(line) {
+			return
+		}
+		subMatches := constants.patternNix.FindStringSubmatch(line)
 		ttl, err := strconv.Atoi(subMatches[4])
 		if err != nil {
 			log.Println(err)
@@ -120,13 +119,11 @@ func (p *PingProcess) parseLine(line string) {
 			Error:   0,
 		}
 		return
-	}
-
-	patternWin, _ := regexp.Compile("Reply from (.*): bytes=(.*) time[=<](.*)ms TTL=(.*)")
-
-	if patternWin.MatchString(line) {
-		// WIN
-		subMatches := patternWin.FindStringSubmatch(line)
+	case WIN:
+		if !constants.patternWin.MatchString(line) {
+			return
+		}
+		subMatches := constants.patternWin.FindStringSubmatch(line)
 		ttl, err := strconv.Atoi(subMatches[4])
 		if err != nil {
 			log.Println(err)
