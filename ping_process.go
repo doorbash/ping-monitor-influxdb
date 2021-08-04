@@ -48,7 +48,7 @@ func (p *PingProcess) StartPingProcess() {
 			}
 
 			var wg sync.WaitGroup
-			wg.Add(2)
+			wg.Add(1)
 
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
@@ -59,14 +59,11 @@ func (p *PingProcess) StartPingProcess() {
 				}
 			}(&wg)
 
-			go func(wg *sync.WaitGroup) {
-				defer wg.Done()
-				scanner := bufio.NewScanner(stdout)
-				for scanner.Scan() {
-					line := scanner.Text()
-					p.parseLine(line)
-				}
-			}(&wg)
+			scanner := bufio.NewScanner(stdout)
+			for scanner.Scan() {
+				line := scanner.Text()
+				p.parseLine(line)
+			}
 
 			wg.Wait()
 
