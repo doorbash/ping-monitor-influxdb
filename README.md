@@ -7,10 +7,7 @@ go build
 ## Usage
 ```
 ping-monitor-influxdb [OPTIONS]
-```
 
-**Options:**
-```
 Application Options:
   -c, --config= path to config file
 
