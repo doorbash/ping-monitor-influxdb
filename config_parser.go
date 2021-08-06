@@ -12,6 +12,8 @@ type ConfigParser struct {
 
 func (c *ConfigParser) Load() (*AppConfig, error) {
 	file, err := os.Open(c.Path)
+	defer file.Close()
+
 	if err != nil {
 		return nil, err
 	}
